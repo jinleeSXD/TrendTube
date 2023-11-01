@@ -21,12 +21,12 @@ import { sendResponse } from '../utils/res'
 import { UserPassword } from '../utils/types'
 
 import { authMiddleware, errorWrap } from '../utils/res'
-
+console.log(process.env.HOST);
 const pool = mysql.createPool({
   host: process.env.HOST,
   user: 'root',
   password: process.env.PASSWORD,
-  database: 'TrendTube',
+  database: 'Trentube_DB',
 })
 
 /*
@@ -85,7 +85,7 @@ router.use(
   })
 )
 
-const port = 3001
+const port = 3000
 
 router.get('/', (req: Request, res: Response) => {
   res.status(200).send('up and running')
@@ -118,7 +118,7 @@ router.post(
         .cookie('token', token, { httpOnly: true })
         .json({ success: true, message: 'user created' })
     }
-
+    console.log(message);
     return sendResponse(res, success, message, result)
   })
 )
@@ -280,9 +280,9 @@ router.get(
   authMiddleware,
   errorWrap(async (req: Request, res: Response) => {
     const sql = `SELECT c.channelTitle, AVG(v.likes) as avgLikes, AVG(v.commentCount) avgComments
-              FROM TrendTube.Video v JOIN TrendTube.Channel c ON (v.channelId=c.id)
+              FROM Trentube_DB.Video v JOIN Trentube_DB.Channel c ON (v.channelId=c.id)
               WHERE v.title LIKE '%music%' and v.id IN (SELECT id
-                                                        FROM TrendTube.Video
+                                                        FROM Trentube_DB.Video
                                                         WHERE views > 100000 and likes > 100000)
               GROUP BY c.channelTitle
               ORDER BY avgLikes, avgComments DESC
@@ -301,11 +301,11 @@ router.get(
   authMiddleware,
   errorWrap(async (req: Request, res: Response) => {
     const sql = `(SELECT v.id, v.title
-                FROM TrendTube.Video v JOIN TrendTube.Tagged td ON (td.videoId = v.id) JOIN TrendTube.Tag tg ON (td.tagId=tg.id)
+                FROM Trentube_DB.Video v JOIN Trentube_DB.Tagged td ON (td.videoId = v.id) JOIN Trentube_DB.Tag tg ON (td.tagId=tg.id)
                 WHERE tg.title LIKE '%music%' AND (v.description LIKE  '%music%'  AND v.title LIKE '%music%' ))
                 UNION
                 (SELECT v.id, v.title
-                FROM TrendTube.Video v JOIN TrendTube.Tagged td ON (td.videoId = v.id) JOIN TrendTube.Tag tg ON (td.tagId=tg.id)
+                FROM Trentube_DB.Video v JOIN Trentube_DB.Tagged td ON (td.videoId = v.id) JOIN Trentube_DB.Tag tg ON (td.tagId=tg.id)
                 WHERE tg.title LIKE '%sport%' AND (v.description LIKE  '%sport%'  AND v.title LIKE '%sport%' ))
                 LIMIT 15`
 
@@ -322,9 +322,9 @@ router.get(
     const { keyword1, limit } = req.query
     console.log(keyword1)
     const sql = `SELECT c.channelTitle, AVG(v.likes) as avgLikes, AVG(v.commentCount) avgComments
-              FROM TrendTube.Video v JOIN TrendTube.Channel c ON (v.channelId=c.id)
+              FROM Trentube_DB.Video v JOIN Trentube_DB.Channel c ON (v.channelId=c.id)
               WHERE v.title LIKE '%${keyword1}%' and v.id IN (SELECT id
-                                                        FROM TrendTube.Video
+                                                        FROM Trentube_DB.Video
                                                         WHERE views > 100000 and likes > 100000)
               GROUP BY c.channelTitle
               ORDER BY avgLikes DESC, avgComments DESC
@@ -344,11 +344,11 @@ router.get(
   errorWrap(async (req: Request, res: Response) => {
     const { keyword1, keyword2, limit } = req.query
     const sql = `(SELECT v.id, v.title, v.likes as likes
-                FROM TrendTube.Video v JOIN TrendTube.Tagged td ON (td.videoId = v.id) JOIN TrendTube.Tag tg ON (td.tagId=tg.id)
+                FROM Trentube_DB.Video v JOIN Trentube_DB.Tagged td ON (td.videoId = v.id) JOIN Trentube_DB.Tag tg ON (td.tagId=tg.id)
                 WHERE tg.title LIKE '%${keyword1}%' AND (v.description LIKE  '%${keyword1}%'  AND v.title LIKE '%${keyword1}%' ))
                 UNION
                 (SELECT v.id, v.title, v.likes as likes
-                FROM TrendTube.Video v JOIN TrendTube.Tagged td ON (td.videoId = v.id) JOIN TrendTube.Tag tg ON (td.tagId=tg.id)
+                FROM Trentube_DB.Video v JOIN Trentube_DB.Tagged td ON (td.videoId = v.id) JOIN Trentube_DB.Tag tg ON (td.tagId=tg.id)
                 WHERE tg.title LIKE '%${keyword2}%' AND (v.description LIKE  '%${keyword2}%'  AND v.title LIKE '%${keyword2}%' ))
                 ORDER BY likes DESC
                 LIMIT ${limit}`
@@ -523,6 +523,7 @@ router.get(
 
     const sql = `CALL CreativeComp('%${title}%', ${viewCount}, ${likeCount}, ${dislikeCount}, ${comments}, ${limit})`
     const { success, result, message } = await runGetQuery(pool, sql)
+    console.log(message);
     return sendResponse(res, success, message, result)
   })
 )

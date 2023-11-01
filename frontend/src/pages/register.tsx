@@ -29,7 +29,7 @@ export default function Register() {
       },
     });
 
-    console.log(response);
+    console.log(API_URL);
 
     setRegUsername("");
     setRegFirstName("");
