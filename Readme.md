@@ -70,7 +70,7 @@ We will also deploy the backend to Google Cloud Platform and host the frontend o
 
 ### UML diagram
 
-![UML diagram](assets/UML.png)
+![UML diagram](doc/assets/UML.png)
 
 ### Assumptions of the ER/UML diagram
 
@@ -236,7 +236,7 @@ ORDER BY avgLikes, avgComments DESC;
 
 These are the top 15 results:
 
-![adv_query_1.png](assets/adv_query1.png)
+![adv_query_1.png](doc/assets/adv_query1.png)
 
 This query returns the id and title of all videos that contain "music" in at least one of their tags, description, and title unioned with all videos that contain "sport" in at least one of their tags, description, and title. It uses JOIN of multiple relations and set operations.
 
@@ -250,7 +250,7 @@ FROM TrendTube.Video v JOIN TrendTube.Tagged td ON (td.videoId = v.id) JOIN Tren
 WHERE tg.title LIKE '%sport%' AND (v.description LIKE  '%sport%'  AND v.title LIKE '%sport%' ));
 ```
 
-![adv_query_2.png](assets/adv_query2.png)
+![adv_query_2.png](doc/assets/adv_query2.png)
 
 ### Stored Procedure
 
